@@ -72,6 +72,6 @@ with DAG(
     cur = return_snowflake_conn()
     stock = "NVDA"
 
-    data = extract(url, "NVDA")
+    data = extract(url, stock)
     lines = transform(data)
     load(cur, lines, stock)
