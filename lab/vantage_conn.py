@@ -64,10 +64,12 @@ with DAG(
     schedule = '0 0 * * *'
 ) as dag:
     url = Variable.get("vantage_api_key")
-    sym = Variable.get("symbol")
+    symbols = Variable.get("symbol")
     cur = return_snowflake_conn()
     target_table = "lab.raw_data.market_data"
-
-    data = extract(url, sym)
-    stock_info = transform(data)
-    load(cur, stock_info, sym, target_table)
+    
+    for sym in symbols.split(","):
+        data = extract(url, sym)
+        stock_info = transform(data)
+        load(cur, stock_info, sym, target_table)
+    cur.close()

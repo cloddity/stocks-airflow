@@ -62,12 +62,18 @@ def predict(cur, forecast_function_name, train_input_table, forecast_table, fina
         print(e)
         raise
 
+def fetch_results(con, table, cond):
+    result = con.execute(f"SELECT * FROM {table} {cond}")
+    df = con.fetch_pandas_all()
+    print(df.head())
+    print(str(len(df)) + " rows")
+
 with DAG(
     dag_id = 'ml_predict',
     start_date = datetime(2024,10,10),
     catchup=False,
     tags=['ML', 'ELT'],
-    schedule = '0 0 * * *'
+    schedule = '10 0 * * *'
 ) as dag:
     train_input_table = "lab.raw_data.market_data"
     train_view = "lab.adhoc.market_data_view"
@@ -78,3 +84,6 @@ with DAG(
 
     train(cur, train_input_table, train_view, forecast_function_name)
     predict(cur, forecast_function_name, train_input_table, forecast_table, final_table)
+    fetch_results(cur, final_table, "")
+    fetch_results(cur, final_table, "WHERE DATE > GETDATE()")
+    cur.close()
