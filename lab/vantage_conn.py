@@ -72,4 +72,3 @@ with DAG(
         data = extract(url, sym)
         stock_info = transform(data)
         load(cur, stock_info, sym, target_table)
-    cur.close()

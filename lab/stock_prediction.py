@@ -86,4 +86,3 @@ with DAG(
     predict(cur, forecast_function_name, train_input_table, forecast_table, final_table)
     fetch_results(cur, final_table, "")
     fetch_results(cur, final_table, "WHERE DATE > GETDATE()")
-    cur.close()
