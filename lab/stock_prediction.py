@@ -62,11 +62,16 @@ def predict(cur, forecast_function_name, train_input_table, forecast_table, fina
         print(e)
         raise
 
-def fetch_results(con, table, cond):
-    result = con.execute(f"SELECT * FROM {table} {cond}")
-    df = con.fetch_pandas_all()
-    print(df.head())
-    print(str(len(df)) + " rows")
+@task
+def fetch_results(cur, table):
+    try:
+        cur.execute(f"SELECT * FROM {table}")
+        df = cur.fetch_pandas_all()
+        print(df.to_string())
+        print(str(len(df)) + " rows")
+    except Exception as e:
+        print(e)
+        raise
 
 with DAG(
     dag_id = 'ml_predict',
@@ -82,7 +87,4 @@ with DAG(
     final_table = "lab.analytics.market_data"
     cur = return_snowflake_conn()
 
-    train(cur, train_input_table, train_view, forecast_function_name)
-    predict(cur, forecast_function_name, train_input_table, forecast_table, final_table)
-    fetch_results(cur, final_table, "")
-    fetch_results(cur, final_table, "WHERE DATE > GETDATE()")
+    train(cur, train_input_table, train_view, forecast_function_name) >> predict(cur, forecast_function_name, train_input_table, forecast_table, final_table) >> fetch_results(cur, final_table)

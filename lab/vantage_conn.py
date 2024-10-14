@@ -37,7 +37,7 @@ def load(con, records, stock, target_table):
         cur.execute("CREATE SCHEMA IF NOT EXISTS adhoc")
         cur.execute("CREATE SCHEMA IF NOT EXISTS analytics")
         cur.execute("CREATE SCHEMA IF NOT EXISTS raw_data")
-        con.execute(f"CREATE OR REPLACE TABLE {target_table} (DATE TIMESTAMP_NTZ PRIMARY KEY, SYMBOL VARCHAR(6), OPEN FLOAT, CLOSE FLOAT, LOW FLOAT, HIGH FLOAT, VOLUME FLOAT);")
+        con.execute(f"CREATE OR REPLACE TABLE {target_table} (DATE TIMESTAMP_NTZ PRIMARY KEY, SYMBOL VARCHAR(6), OPEN FLOAT, CLOSE FLOAT, LOW FLOAT, HIGH FLOAT, VOLUME INTEGER);")
         for r in records:
             open = r["1. open"]
             high = r["2. high"]
