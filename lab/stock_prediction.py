@@ -37,10 +37,12 @@ def train(cur, train_input_table, train_view, forecast_function_name):
 
 @task
 def predict(cur, forecast_function_name, train_input_table, forecast_table, final_table):
+    fp = Variable.get("forecast_period")
+    pred_int = Variable.get("pred_interval")
     make_prediction_sql = f"""BEGIN
         CALL {forecast_function_name}!FORECAST(
-            FORECASTING_PERIODS => 7,
-            CONFIG_OBJECT => {{'prediction_interval': 0.95}}
+            FORECASTING_PERIODS => {fp},
+            CONFIG_OBJECT => {{'prediction_interval': {pred_int}}}
         );
         LET x := SQLID;
         CREATE OR REPLACE TABLE {forecast_table} AS SELECT * FROM TABLE(RESULT_SCAN(:x));
